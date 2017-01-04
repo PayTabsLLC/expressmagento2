@@ -1,0 +1,53 @@
+<!--
+/**
+ * @category   MagePsycho
+ * @package    PayTabs_Express
+ * @author     Raj KB <magepsycho@gmail.com>
+ * @website    http://www.magepsycho.com
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+ -->
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
+
+        <label data-bind="attr: {'for': getCode()}" class="label">
+            <div data-bind="attr: { 'class': getCode() + ' ' + getDisplayLogoClass() }"></div>
+            <span data-bind="text: getTitle()"></span>
+        </label>
+    </div>
+
+    <div class="payment-method-content mp-paytabs">
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address mp-paytabs">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+        <div id="paytabs-iframe-container" style="display: none;">
+            <iframe frameborder="0" allowtransparency="true" src="" id="PT_express_checkout_wrap" name="PT_express_checkout_wrap" class="PT_express_checkout_wrap" style="z-index: 2147483647; background: rgba(0, 0, 0, 0.00392157); border: 0px none transparent; overflow-x: hidden; overflow-y: auto; margin: 0px; padding: 0px; -webkit-tap-highlight-color: transparent; left: 0px; top: 0px; width: 100%; height: 100%; min-height: 325px;" kwframeid="2"></iframe>
+        </div>
+        <p data-bind="html: getInstructions()" style="display: none;"></p>
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <div class="actions-toolbar mp-paytabs">
+            <div class="primary">
+                <button class="action primary checkout"
+                        type="submit"
+                        data-bind="click: placeOrder, enable: (getCode() == isChecked())"
+                        disabled>
+                    <span data-bind="text: 'Continue'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

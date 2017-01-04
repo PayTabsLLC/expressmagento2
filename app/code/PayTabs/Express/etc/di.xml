@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category   MagePsycho
+ * @package    PayTabs_Express
+ * @author     Raj KB <magepsycho@gmail.com>
+ * @website    http://www.magepsycho.com
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <virtualType name="magepsycho_paytabs_logger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers"  xsi:type="array">
+                <item name="debug" xsi:type="object">PayTabs\Express\Logger\Handler\Custom</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="PayTabs\Express\Helper\Data">
+        <arguments>
+            <argument name="customLogger" xsi:type="object">magepsycho_paytabs_logger</argument>
+        </arguments>
+    </type>
+
+</config>
