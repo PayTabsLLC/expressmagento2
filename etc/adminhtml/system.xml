@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category   MagePsycho
+ * @package    PayTabs_Express
+ * @author     Raj KB <magepsycho@gmail.com>
+ * @website    http://www.magepsycho.com
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+
+        <section id="payment" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="paytabs_standard" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>PayTabs (IFrame)</label>
+                <comment><![CDATA[Accept credit cards using PayTabs in your Magento store and your customers never have to leave your store to complete the payment.<br /><div class="paytabs-wrapper"><div class="paytabs-logo"></div><div class="paytabs-cards"></div></div>]]></comment>
+                <field id="paytabs_header_start" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[&nbsp;]]></label>
+                    <frontend_model>PayTabs\Express\Block\System\Config\Form\Field\Header</frontend_model>
+                </field>
+                <field id="version" translate="label" type="label" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Version</label>
+                    <frontend_model>PayTabs\Express\Block\System\Config\Form\Field\Version</frontend_model>
+                </field>
+                <field id="active" translate="label" type="select" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Debug</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="license_header_start" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[&nbsp;]]></label>
+                    <frontend_model>PayTabs\Express\Block\System\Config\Form\Field\Header</frontend_model>
+                </field>
+                <field id="merchant_id" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant ID</label>
+                </field>
+                <field id="secret_key" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Secret Key</label>
+                </field>
+                <field id="secure_hash_key" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Secure Hash String</label>
+                </field>
+
+                <field id="license_header_end" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[&nbsp;]]></label>
+                    <frontend_model>PayTabs\Express\Block\System\Config\Form\Field\Header</frontend_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                </field>
+
+                <field id="pay_button_img" translate="label" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Pay Button Image Url</label>
+                    <comment><![CDATA[Preferred image dimension: 127 x 40 (Width x Height).]]></comment>
+                </field>
+                <field id="checkout_button_img" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Checkout Button Image Url</label>
+                    <comment><![CDATA[Preferred image dimension: 127 x 40 (Width x Height).]]></comment>
+                </field>
+
+                <field id="display_logo_type" translate="label" type="select" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Display Logo</label>
+                    <source_model>PayTabs\Express\Model\Config\Source\Logotype</source_model>
+                </field>
+
+                <field id="misc_header_start" sortOrder="56" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[&nbsp;]]></label>
+                    <frontend_model>PayTabs\Express\Block\System\Config\Form\Field\Header</frontend_model>
+                </field>
+                <field id="gateway_currency" translate="label" type="select" sortOrder="59" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Gateway Currency</label>
+                    <comment>The currency that will be sent to the PayTabs</comment>
+                    <source_model>PayTabs\Express\Model\Config\Source\Currency</source_model>
+                </field>
+                <field id="order_status" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>New Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status\NewStatus</source_model>
+                </field>
+                <field id="order_status_failed" translate="label" type="select" sortOrder="61" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Failed Order Status</label>
+                    <source_model>PayTabs\Express\Model\Config\Source\Order\Status\Canceled</source_model>
+                </field>
+
+                <field id="allowspecific" translate="label" type="allowspecific" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Payment from Specific Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+                <field id="instructions" translate="label" type="textarea" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Instructions</label>
+                </field>
+                <field id="min_order_total" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Minimum Order Total</label>
+                </field>
+                <field id="max_order_total" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Maximum Order Total</label>
+                    <comment>Leave empty to disable limit</comment>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="999" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sort Order</label>
+                </field>
+            </group>
+        </section>
+
+    </system>
+</config>

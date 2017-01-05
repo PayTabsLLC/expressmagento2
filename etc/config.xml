@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category   MagePsycho
+ * @package    PayTabs_Express
+ * @author     Raj KB <magepsycho@gmail.com>
+ * @website    http://www.magepsycho.com
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <paytabs_standard>
+                <active>0</active>
+                <model>PayTabs\Express\Model\Payment\Standard</model>
+                <sandbox>1</sandbox>
+                <debug>0</debug>
+                <gateway_currency>store</gateway_currency>
+                <order_status>pending</order_status>
+                <order_status_failed>canceled</order_status_failed>
+                <title>Credit card payments powered by PayTabs.com</title>
+                <!--<instructions>You will be redirected to PayTabs website when you place an order.</instructions>-->
+                <allowspecific>0</allowspecific>
+                <!-- For Test
+                Merchant Id:
+                    10012472
+                Secret Key:
+                Plm7xgTOZTYueBKle3jIBUD5HP8LLAjAVFIsWBhWufqIRb46enOQirW0g5L1F4CBKk4GVlCqA39sfdyuAnkTOhT5mE72JJDt4Ha0
+                Secure Hash String:
+                    secure@paytabs#@aaes11%%
+                -->
+
+                <secure_hash_key><![CDATA[secure@paytabs#@aaes11%%]]></secure_hash_key>
+
+                <gateway_url>https://www.paytabs.com/</gateway_url>
+                <gateway_url_sandbox>https://www.paytabs.com/</gateway_url_sandbox>
+
+                <redirect_url>paytabs/standard/redirect</redirect_url>
+                <return_url>paytabs/standard/returnAction</return_url>
+                <success_url>paytabs/standard/success</success_url>
+                <failure_url>paytabs/standard/failure</failure_url>
+                <cancel_url>paytabs/standard/cancel</cancel_url>
+                <callback_url>paytabs/standard/callback</callback_url>
+
+            </paytabs_standard>
+        </payment>
+    </default>
+</config>

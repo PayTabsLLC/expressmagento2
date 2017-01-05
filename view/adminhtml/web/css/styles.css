@@ -1,0 +1,22 @@
+.paytabs-wrapper {
+    display: inline-block;
+    width: 100%;
+    padding-top: 20px;
+}
+.paytabs-wrapper .paytabs-logo {
+    padding-left: 150px;
+    background: url(../images/paytabs_logo.png) no-repeat 0 0 / 145px auto;
+    line-height: 36px;
+    height: 66px;
+    width: auto;
+    float: left;
+}
+.paytabs-wrapper .paytabs-cards {
+    background: url(../images/paytabs_allinone.png) no-repeat 0 0 / 100% auto;
+    content: "";
+    display: inline;
+    float: right;
+    height: 57px;
+    width: 188px;
+    text-align: right;
+}
