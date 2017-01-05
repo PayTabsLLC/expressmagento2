@@ -24,5 +24,7 @@
     "psr-4": {
       "PayTabs\\Express\\": ""
     }
-  }
+  },
+    "minimum-stability": "alpha",
+    "prefer-stable": true
 }
