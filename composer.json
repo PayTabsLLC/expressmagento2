@@ -22,7 +22,7 @@
       "registration.php"
     ],
     "psr-4": {
-      "PayTabs\\Express": ""
+      "PayTabs\\Express\\": ""
     }
   }
 }
