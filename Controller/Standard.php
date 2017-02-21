@@ -56,6 +56,16 @@ abstract class Standard extends \Magento\Framework\App\Action\Action
      */
     protected $_logger;
 
+    /**
+     * @var \Magento\Sales\Model\Service\InvoiceService
+     */
+    protected $_invoiceService;
+
+    /**
+     * @var \Magento\Framework\DB\Transaction
+     */
+    protected $_transaction;
+
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Customer\Model\Session $customerSession,
@@ -65,7 +75,9 @@ abstract class Standard extends \Magento\Framework\App\Action\Action
         \PayTabs\Express\Helper\Data $paymentHelper,
         \PayTabs\Express\Model\Payment\Standard $paymentMethod,
         \Magento\Sales\Api\OrderManagementInterface $orderManagement,
-        \Psr\Log\LoggerInterface $loggerInterface
+        \Psr\Log\LoggerInterface $loggerInterface,
+        \Magento\Sales\Model\Service\InvoiceService $invoiceService,
+        \Magento\Framework\DB\Transaction $transaction
     ) {
         $this->_customerSession     = $customerSession;
         $this->_checkoutSession     = $checkoutSession;
@@ -75,6 +87,8 @@ abstract class Standard extends \Magento\Framework\App\Action\Action
         $this->_paymentMethod       = $paymentMethod;
         $this->_orderManagement     = $orderManagement;
         $this->_logger              = $loggerInterface;
+        $this->_invoiceService      = $invoiceService;
+        $this->_transaction         = $transaction;
 
         parent::__construct($context);
     }
@@ -118,6 +132,18 @@ abstract class Standard extends \Magento\Framework\App\Action\Action
         $order->save();
     }
 
+    protected function _addStatusHistory(
+        \Magento\Sales\Model\Order $order,
+        $message,
+        $status = false
+    ) {
+        $order->addStatusHistoryComment(
+            $message,
+            $status
+        );
+        $order->save();
+    }
+
     protected function _cancelOrder(\Magento\Sales\Model\Order $order, $message = '')
     {
         if ($order->getState() != \Magento\Sales\Model\Order::STATE_CANCELED) {
@@ -152,9 +178,55 @@ abstract class Standard extends \Magento\Framework\App\Action\Action
                 $customerNotified
             );
             $order->save();
+
             return true;
         }
         return false;
+    }
+
+    protected function _createInvoice(\Magento\Sales\Model\Order $order, $online = false)
+    {
+        if ($order->canInvoice()) {
+            $invoice = $this->_invoiceService->prepareInvoice($order);
+            $invoice->setRequestedCaptureCase(
+                $online ? \Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE : \Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE
+            );
+            $invoice->register();
+            $invoice->save();
+
+            $transaction = $this->_transaction->addObject(
+                $invoice
+            )->addObject(
+                $invoice->getOrder()
+            );
+            $transaction->save();
+            $this->invoiceSender->send($invoice);
+
+            //send notification code
+            $order->addStatusHistoryComment(
+                __('Notified customer about invoice #%1.', $invoice->getId())
+            )
+            ->setIsCustomerNotified(true)
+            ->save();
+            return $invoice;
+        }
+        return false;
+    }
+
+    protected function _addPaymentTransaction(\Magento\Sales\Model\Order $order, array $details = [])
+    {
+        $transaction = $order->getPayment()->addTransaction(
+            \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH,
+            null,
+            true
+        );
+        $transaction->setIsClosed(0);
+        $transaction->setAdditionalInformation(
+            \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
+            $details
+        );
+        $transaction->save();
+        return $transaction;
     }
 
     protected function _sendOrderEmail(\Magento\Sales\Model\Order $order)

@@ -100,7 +100,7 @@ class PaymentData extends \PayTabs\Express\Controller\Standard
                 'display_billing_fields'    =>  0,
                 'display_shipping_fields'   =>  0,
                 'language'                  =>  $language,
-                'redirect_on_reject'        => 0,
+                'redirect_on_reject'        => 1,
                 'style' => [
                     'css'       => 'custom',
                     'linktocss' => $linkToCss

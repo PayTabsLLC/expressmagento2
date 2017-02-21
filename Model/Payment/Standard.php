@@ -112,7 +112,7 @@ class Standard extends \Magento\Payment\Model\Method\AbstractMethod
      */
     protected function _initialize()
     {
-        $this->_supportedCurrencyCodes = ['USD', 'AUD'];
+        $this->_supportedCurrencyCodes = ['USD', 'AED'];
     }
 
     /**

@@ -11,6 +11,8 @@ namespace PayTabs\Express\Controller\Standard;
  */
 class ReturnAction extends \PayTabs\Express\Controller\Standard
 {
+    const RESPONSE_CODE_SUCCESS = 100;
+
     // Generic Return Url
     public function execute()
     {
@@ -64,21 +66,30 @@ class ReturnAction extends \PayTabs\Express\Controller\Standard
 
         if ($compareDigest != $secureSign) {
             $message = 'Signature doesn\'t match.';
-            $this->_failOrder($order, $message);
-
-            $this->_paymentHelper->log('Transaction failed for order::' . $orderId);
-            $this->_paymentHelper->log('Reason => ' . $message);
-
-            $this->messageManager->addError(__($message));
-            $this->_checkoutSession->restoreQuote();
-            $this->_redirect('checkout/cart');
-            return;
+            $this->_failAndRedirect($order, $message);
+            return $this;
         }
 
-        $this->_paymentHelper->log('Successfull transaction for order::' . $orderId);
-        $this->_paymentHelper->log('Order has been successfully paid via PayTabs.');
+        if ($responseCode != self::RESPONSE_CODE_SUCCESS) {
+            $this->_failAndRedirect($order, $responseMessage);
+            return $this;
+        }
 
-        $this->_processOrder($order, 'Order has been successfully paid via PayTabs.');
+
+        $this->_preProcessOrder($order, __('Customer successfully returned from PayTabs.'));
         $this->_redirect('checkout/onepage/success');
+    }
+
+    protected function _failAndRedirect($order, $message)
+    {
+        $this->_failOrder($order, $message);
+
+        $this->_paymentHelper->log('Transaction failed for order::' . $order->getId());
+        $this->_paymentHelper->log('Reason => ' . $message);
+
+        $this->messageManager->addError(__($message));
+        $this->_checkoutSession->restoreQuote();
+        $this->_redirect('checkout/cart');
+        return;
     }
 }
