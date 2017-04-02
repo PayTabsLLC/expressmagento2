@@ -66,6 +66,16 @@ abstract class Standard extends \Magento\Framework\App\Action\Action
      */
     protected $_transaction;
 
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\InvoiceSender
+     */
+    protected $_invoiceSender;
+
+    /**
+     * @var \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface
+     */
+    protected $_transactionBuilder;
+
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Customer\Model\Session $customerSession,
@@ -77,6 +87,8 @@ abstract class Standard extends \Magento\Framework\App\Action\Action
         \Magento\Sales\Api\OrderManagementInterface $orderManagement,
         \Psr\Log\LoggerInterface $loggerInterface,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
+        \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender,
+        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
         \Magento\Framework\DB\Transaction $transaction
     ) {
         $this->_customerSession     = $customerSession;
@@ -88,6 +100,9 @@ abstract class Standard extends \Magento\Framework\App\Action\Action
         $this->_orderManagement     = $orderManagement;
         $this->_logger              = $loggerInterface;
         $this->_invoiceService      = $invoiceService;
+        $this->_invoiceSender       = $invoiceSender;
+        $this->_transactionBuilder  = $transactionBuilder;
+
         $this->_transaction         = $transaction;
 
         parent::__construct($context);
@@ -126,8 +141,7 @@ abstract class Standard extends \Magento\Framework\App\Action\Action
     protected function _preProcessOrder(\Magento\Sales\Model\Order $order, $message = '')
     {
         $order->addStatusHistoryComment(
-            $message,
-            \Magento\Sales\Model\Order::STATE_PENDING_PAYMENT
+            $message
         );
         $order->save();
     }
@@ -200,7 +214,7 @@ abstract class Standard extends \Magento\Framework\App\Action\Action
                 $invoice->getOrder()
             );
             $transaction->save();
-            $this->invoiceSender->send($invoice);
+            $this->_invoiceSender->send($invoice);
 
             //send notification code
             $order->addStatusHistoryComment(
@@ -213,18 +227,17 @@ abstract class Standard extends \Magento\Framework\App\Action\Action
         return false;
     }
 
-    protected function _addPaymentTransaction(\Magento\Sales\Model\Order $order, array $details = [])
+    protected function _createTransaction(\Magento\Sales\Model\Order $order, array $details = [])
     {
-        $transaction = $order->getPayment()->addTransaction(
-            \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH,
-            null,
-            true
-        );
-        $transaction->setIsClosed(0);
-        $transaction->setAdditionalInformation(
-            \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
-            $details
-        );
+        $transaction = $this->_transactionBuilder
+            ->setPayment($order->getPayment())
+            ->setOrder($order)
+            ->setTransactionId($order->getPayment()->getLastTransId())
+            ->setAdditionalInformation(
+                [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS => (array) $details]
+            )
+            ->setFailSafe(true)
+            ->build(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE);
         $transaction->save();
         return $transaction;
     }
@@ -232,15 +245,21 @@ abstract class Standard extends \Magento\Framework\App\Action\Action
     protected function _sendOrderEmail(\Magento\Sales\Model\Order $order)
     {
         $result = true;
-        try{
-            if($order->getState() != \Magento\Sales\Model\Order::STATE_PROCESSING) {
-                $orderCommentSender = $this->_objectManager
-                    ->create('Magento\Sales\Model\Order\Email\Sender\OrderCommentSender');
-                $orderCommentSender->send($order, true, '');
-            }
-            else{
-                $this->_orderManagement->notify($order->getEntityId());
-            }
+        try {
+            $this->_orderManagement->notify($order->getEntityId());
+        } catch (\Exception $e) {
+            $result = false;
+            $this->_logger->critical($e);
+        }
+
+        return $result;
+    }
+
+    protected function _sendInvoiceEmail($invoice)
+    {
+        $result = true;
+        try {
+            $this->_invoiceSender->send($invoice);
         } catch (\Exception $e) {
             $result = false;
             $this->_logger->critical($e);

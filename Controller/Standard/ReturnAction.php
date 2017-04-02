@@ -53,31 +53,81 @@ class ReturnAction extends \PayTabs\Express\Controller\Standard
             return;
         }
 
-        // Create signature and check with secure_sign
-        $secureParams = [
-            'order_id'              => $orderId,
-            'response_code'         => $responseCode,
-            'customer_name'         => $customerName,
-            'transaction_currency'  => $transactionCurrency,
-            'last_4_digits'         => $last4Digits,
-            'customer_email'        => $customerEmail
-        ];
-        $compareDigest = $this->_paymentHelper->createSecureHash($secureParams);
+        $apiUrl         = 'https://www.paytabs.com/apiv2/verify_payment_transaction';
+        $dataString     = $this->_prepareCurlPostData($transactionId);
 
-        if ($compareDigest != $secureSign) {
-            $message = 'Signature doesn\'t match.';
+        /*$this->_paymentHelper->log(var_export($curlResult, true));
+        $this->_paymentHelper->log(var_export($curlError, true));*/
+
+        $result = $this->_paymentHelper->curlPost($apiUrl, $dataString);
+        if (
+            $transactionId
+            && isset($result['response_code'])
+            && $result['response_code'] == self::RESPONSE_CODE_SUCCESS
+        ) {
+            // @todo wrap in a method @see Callback::execute()
+            $this->_processOrder($order, 'Order has been successfully paid via PayTabs.');
+            // Create Sales Payment
+            $payment = $order->getPayment();
+            $payment->setTransactionId($transactionId)
+                    ->setLastTransId($transactionId)
+                    ->setAdditionalData(serialize($request->getParams()))
+                    ->setAdditionalInformation(
+                        [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS => (array) $request->getParams()]
+                    )
+                //->setStatus()
+            ;
+            $payment->save();
+
+            // Create Payment Transaction
+            $this->_createTransaction($order, $request->getParams());
+
+            // Create Sales Invoice
+            $invoice = null;
+            if (!$order->hasInvoices()) {
+                $invoice = $order->prepareInvoice();
+                $invoice->register();
+
+                $invoice->setTransactionId($transactionId);
+                $order->addRelatedObject($invoice);
+                $invoice->save();
+            }
+
+            // Update Order status & comment and send email
+            $order->setStatus($order::STATE_PROCESSING);
+            $order->setState($order::STATE_PROCESSING);
+            $order->save();
+
+            $customerNotified = $this->_sendOrderEmail($order);
+            $order->addStatusToHistory($order::STATE_PROCESSING , 'Payment has been captured via PayTabs.', $customerNotified);
+            $order->save();
+
+            // Send invoice email
+            if ($invoice) {
+                $this->_sendInvoiceEmail($invoice);
+            }
+
+            $this->_redirect('checkout/onepage/success');
+            return;
+        } else {
+            $message = $result['result'] ?: 'Unknown exception occured.';
             $this->_failAndRedirect($order, $message);
-            return $this;
+            return;
         }
+    }
 
-        if ($responseCode != self::RESPONSE_CODE_SUCCESS) {
-            $this->_failAndRedirect($order, $responseMessage);
-            return $this;
+    protected function _prepareCurlPostData($transactionId)
+    {
+        $fields = [
+            'merchant_email'    => $this->_paymentHelper->getMerchantEmail(),
+            'secret_key'        => $this->_paymentHelper->getSecretKey(),
+            'transaction_id'    => $transactionId
+        ];
+        $fieldsString = '';
+        foreach ($fields as $key => $value) {
+            $fieldsString .= $key . '=' . $value . '&';
         }
-
-
-        $this->_preProcessOrder($order, __('Customer successfully returned from PayTabs.'));
-        $this->_redirect('checkout/onepage/success');
+        return rtrim($fieldsString, '&');
     }
 
     protected function _failAndRedirect($order, $message)

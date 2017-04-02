@@ -17,6 +17,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     const XML_PATH_ENABLED              = 'paytabs_standard/active';
     const XML_PATH_DEBUG                = 'paytabs_standard/debug';
+    const XML_PATH_IPN_ENABLED          = 'paytabs_standard/ipn_active';
     const XML_PATH_FAILURE_STATUS       = 'paytabs_standard/order_status_failed';
     const XML_PATH_PAY_BUTTON_IMG       = 'paytabs_standard/pay_button_img';
     const XML_PATH_CHECKOUT_BUTTON_IMG  = 'paytabs_standard/checkout_button_img';
@@ -68,6 +69,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_localeResolver          = $localeResolver;
 
         parent::__construct($context);
+    }
+
+    public function getMerchantEmail()
+    {
+        return $this->getConfigValue('paytabs_standard/merchant_email');
     }
     
     public function getMerchantId()
@@ -156,6 +162,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function isActive($storeId = null)
     {
         return $this->isEnabled($storeId);
+    }
+
+    public function isIpnActive($storeId = null)
+    {
+        return $this->getConfigValue(self::XML_PATH_IPN_ENABLED, $storeId);
     }
 
     /**
@@ -291,5 +302,65 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return sha1($digest);
+    }
+
+    /**
+     * Converts array to beautiful table
+     * Used for emailing purpose
+     *
+     * @param $data
+     * @return string
+     */
+    public function tabularize($data)
+    {
+        if (empty($data)) return '';
+
+        $firstKey = key( array_slice($data, 0, 1, true ) );
+        $headers = array_keys($data[$firstKey]);
+        $tableData = array();
+
+        $tableData[] = '<table border="1" cellpadding="6" cellspacing="0" style="margin-top:10px;font:16px/1.35em Verdana,Arial,Helvetica,sans-serif;margin-bottom:10px">';
+        $tableData[] = '<tr>';
+        $tableData[] = sprintf('<th>#</th>');
+        foreach ($headers as $title) {
+            $tableData[] = sprintf('<th>%s</th>', ucwords(str_replace('_', ' ', $title)) );
+        }
+        $tableData[] = '</tr>';
+
+        $count = 1;
+        foreach ($data as $key => $stock) {
+            $zebraClass     = $count % 2 == 0 ? ' style="background-color:rgb(233,233,233)"' : null;
+            $tableData[]    = sprintf('<tr%s>', $zebraClass);
+            $tableData[]    = sprintf('<td align="center" valign="top">%s.</td>', $count);
+            foreach ($stock as $value) {
+                if (is_array($value)) {
+                    $value = implode(', ', $value);
+                }
+                $tableData[] = sprintf('<td align="center" valign="top">%s</td>', $value);
+            }
+            $tableData[] = '</tr>';
+            $count++;
+        }
+
+        $tableData[] = '</table>';
+        return implode("\n", $tableData);
+    }
+
+    public function curlPost($apiUrl, $dataString)
+    {
+        $ch           = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $apiUrl);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+
+        if (!($curlResult = curl_exec($ch))) {
+            $this->log('Curl Post Error::' . curl_error($ch));
+            return [];
+        }
+
+        return json_decode($curlResult, true);
     }
 }

@@ -32,6 +32,7 @@
                 -->
 
                 <secure_hash_key><![CDATA[secure@paytabs#@aaes11%%]]></secure_hash_key>
+                <ipn_active>0</ipn_active>
 
                 <gateway_url>https://www.paytabs.com/</gateway_url>
                 <gateway_url_sandbox>https://www.paytabs.com/</gateway_url_sandbox>

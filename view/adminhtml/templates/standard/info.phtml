@@ -1,3 +1,30 @@
+<?php
+$paymentMethod = $block->getMethod();
+$additionalInfo = $paymentMethod->getInfoInstance()->getAdditionalData();
+?>
 <dl class="payment-method paytabs-standard">
-    <dt class="title"><?php echo $block->escapeHtml($block->getMethod()->getTitle()) ?></dt>
+    <dt class="title"><?php echo $block->escapeHtml($paymentMethod->getTitle()) ?></dt>
 </dl>
+<div class="admin__page-section-item paytabs-standard-information">
+    <!--<div class="admin__page-section-item-title">
+        <span class="title">Payment Information</span>
+        <div class="actions"></div>
+    </div>-->
+    <div class="admin__page-section-item-content">
+        <table class="admin__table-secondary order-paytabs-standard-information-table">
+            <tbody>
+            <?php
+            if (!empty($additionalInfo)) :
+                $additionalInfoArray = unserialize($additionalInfo)
+            ?>
+                <?php foreach ($additionalInfoArray as $key => $value): ?>
+                    <tr>
+                        <th><?php echo $key ?></th>
+                        <td><?php echo $value ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>

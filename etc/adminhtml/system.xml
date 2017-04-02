@@ -35,29 +35,58 @@
                     <label><![CDATA[&nbsp;]]></label>
                     <frontend_model>PayTabs\Express\Block\System\Config\Form\Field\Header</frontend_model>
                 </field>
-                <field id="merchant_id" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="merchant_email" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Email</label>
+                </field>
+                <field id="merchant_id" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Merchant ID</label>
                 </field>
-                <field id="secret_key" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="secret_key" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Secret Key</label>
                 </field>
-                <field id="secure_hash_key" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="secure_hash_key" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Secure Hash String</label>
                 </field>
-
-                <field id="license_header_end" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="ipn_header_start" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label><![CDATA[&nbsp;]]></label>
                     <frontend_model>PayTabs\Express\Block\System\Config\Form\Field\Header</frontend_model>
                 </field>
-                <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="ipn_active" translate="label" type="select" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>IPN Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="ipn_url" translate="label" type="label" sortOrder="18" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>IPN Listener URL</label>
+                    <frontend_model>PayTabs\Express\Block\System\Config\Form\Field\IpnUrl</frontend_model>
+                </field>
+                <!--<field id="recipient_name" translate="label" type="text" sortOrder="18" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recipient Name</label>
+                    <depends>
+                        <field id="ipn_active">1</field>
+                    </depends>
+                </field>-->
+                <field id="recipient_email" translate="label" type="text" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recipient Emails)</label>
+                    <comment><![CDATA[Use comma separated(,) for multiple emails.]]></comment>
+                    <depends>
+                        <field id="ipn_active">1</field>
+                    </depends>
+                </field>
+
+
+                <field id="license_header_end" sortOrder="29" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[&nbsp;]]></label>
+                    <frontend_model>PayTabs\Express\Block\System\Config\Form\Field\Header</frontend_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Title</label>
                 </field>
 
-                <field id="pay_button_img" translate="label" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="pay_button_img" translate="label" type="text" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Pay Button Image Url</label>
                     <comment><![CDATA[Preferred image dimension: 127 x 40 (Width x Height).]]></comment>
                 </field>
-                <field id="checkout_button_img" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="checkout_button_img" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Checkout Button Image Url</label>
                     <comment><![CDATA[Preferred image dimension: 127 x 40 (Width x Height).]]></comment>
                 </field>
