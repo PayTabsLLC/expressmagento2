@@ -95,6 +95,11 @@ class Callback extends \PayTabs\Express\Controller\Standard
             return $this;
         }
 
+        if (!in_array($responseCode, $this->_paymentHelper->getSuccessResponseCodes())) {
+            $this->_paymentHelper->log('Transaction is not valid for processing => $orderId::' . $orderId . ', $responseCode::' . $responseCode);
+            return $this;
+        }
+
         // @todo wrap in a method @see ReturnAction::execute()
         $this->_paymentHelper->log('Order has been successfully paid via PayTabs.');
         $this->_processOrder($order, 'Order has been successfully paid via PayTabs.');

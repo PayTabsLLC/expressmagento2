@@ -11,7 +11,6 @@ namespace PayTabs\Express\Controller\Standard;
  */
 class ReturnAction extends \PayTabs\Express\Controller\Standard
 {
-    const RESPONSE_CODE_SUCCESS = 100;
 
     // Generic Return Url
     public function execute()
@@ -63,7 +62,7 @@ class ReturnAction extends \PayTabs\Express\Controller\Standard
         if (
             $transactionId
             && isset($result['response_code'])
-            && $result['response_code'] == self::RESPONSE_CODE_SUCCESS
+            && in_array($result['response_code'], $this->_paymentHelper->getSuccessResponseCodes())
         ) {
             // @todo wrap in a method @see Callback::execute()
             $this->_processOrder($order, 'Order has been successfully paid via PayTabs.');

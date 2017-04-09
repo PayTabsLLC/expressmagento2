@@ -50,6 +50,7 @@ class PaymentData extends \PayTabs\Express\Controller\Standard
         $phoneNumber    = $billingAddress->getTelephone();
         $emailAddress   = $billingAddress->getEmail();
         $countryCode    = $billingAddress->getCountryId();
+        $countryCallingCode = $this->_paymentHelper->getCallingCode($countryCode);
         $addresses      = $billingAddress->getStreet();
         $fullAddress    = implode(', ', $addresses);
         $city           = $billingAddress->getCity();
@@ -115,7 +116,7 @@ class PaymentData extends \PayTabs\Express\Controller\Standard
                 'last_name'     => $lastname,
                 'phone_number'  => $phoneNumber,
                 'email_address' => $emailAddress,
-                'country_code'  => $countryCode, //'973'
+                'country_code'  => $countryCallingCode,
             ],
             'billing_address' => [
                 'full_address'  => $fullAddress,
