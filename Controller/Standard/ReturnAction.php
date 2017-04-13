@@ -3,10 +3,10 @@
 namespace PayTabs\Express\Controller\Standard;
 
 /**
- * @category   MagePsycho
- * @package    PayTabs_Express
- * @author     Raj KB <magepsycho@gmail.com>
- * @website    http://www.magepsycho.com
+ * @category   PayTabs Payment
+ * @package    PayTabs_Expressmagento2
+ * @author     Support <support@paytabs.com>
+ * @website    https://www.paytabs.com
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 class ReturnAction extends \PayTabs\Express\Controller\Standard
@@ -16,7 +16,7 @@ class ReturnAction extends \PayTabs\Express\Controller\Standard
     public function execute()
     {
         // Test:
-        // ?transaction_id=49751&order_id=000000010&response_code=100&customer_name=Raj Bhtt&transaction_currency=USD&last_4_digits=1111&customer_email=magepsycho@gmail.com&secure_sign=fefadacfafc597fa8c0d86d6898e8bd7eb47b592
+        // ?transaction_id=49751&order_id=000000010&response_code=100&customer_name=Test user&transaction_currency=USD&last_4_digits=1111&customer_email=testuser@gmail.com&secure_sign=fefadacfafc597fa8c0d86d6898e8bd7eb47b592
 
         $request = $this->getRequest();
 

@@ -3,10 +3,10 @@
 namespace PayTabs\Express\Controller\Standard;
 
 /**
- * @category   MagePsycho
- * @package    PayTabs_Express
- * @author     Raj KB <magepsycho@gmail.com>
- * @website    http://www.magepsycho.com
+ * @category   PayTabs Payment
+ * @package    PayTabs_Expressmagento2
+ * @author     Support <support@paytabs.com>
+ * @website    https://www.paytabs.com
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 class Callback extends \PayTabs\Express\Controller\Standard
@@ -19,8 +19,8 @@ class Callback extends \PayTabs\Express\Controller\Standard
             'order_id' => '000000037',
             'response_code' => '100',
             'response_message' => 'Approved',
-            'customer_name' => 'Raj KB',
-            'customer_email' => 'magepsychostore@gmail.com',
+            'customer_name' => 'Test user',
+            'customer_email' => 'testuser@gmail.com',
             'transaction_amount' => '27.00',
             'transaction_currency' => 'USD',
             'customer_phone' => 'AE +97122334455',
